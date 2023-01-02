@@ -14,6 +14,7 @@ import IEquation from "@/interfaces/IEquation";
 import nerdamer from "nerdamer";
 import { useMutation } from "@apollo/client";
 import { CREATE_EQUATION, CREATE_VARIABLE } from "@/Graphql/Mutations";
+import Router from "next/router";
 
 const config = {
   loader: { load: ["input/asciimath"] },
@@ -29,9 +30,10 @@ const config = {
 interface IProps {
   Equation?: IEquation;
   courseID: number;
+  onClose: () => void;
 }
 
-const EquationFormEditor = ({ Equation, courseID }: IProps) => {
+const EquationFormEditor = ({ Equation, courseID, onClose }: IProps) => {
   const [newEquation, setNewEquation] = useState<IEquation>(
     Equation
       ? Equation
@@ -62,6 +64,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
     } catch {
       return;
     }
+    console.log(variables);
 
     if (variables) {
       const res: IVariable[] = variables?.map((variable, index) => {
@@ -78,9 +81,9 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
 
   const DisplayVariables = (equation: IEquation) => {
     return (
-      <Grid container spacing={0.5} key={"variables_container"} m={0}>
+      <Grid container spacing={0.5} m={0} key="variables_container">
         <Grid item xs={2}>
-          <Typography variant="subtitle2">Variable Name</Typography>
+          <Typography variant="subtitle2">Name</Typography>
         </Grid>
         <Grid item xs={2}>
           <Typography variant="subtitle2">Units</Typography>
@@ -90,10 +93,10 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
         </Grid>
         {equation.variables.map((variable: IVariable, index: number) => (
           <>
-            <Grid item xs={2} key={`${variable.name}_name_container`}>
+            <Grid item xs={2} key={`${index}_name_container`}>
               <TextField
                 defaultValue={variable.name}
-                key={index + "_variable_name"}
+                key={variable.name + "_variable_name"}
                 fullWidth
                 size="small"
                 InputProps={{
@@ -101,10 +104,10 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
                 }}
               />
             </Grid>
-            <Grid item xs={2} key={`${variable.name}_unit_container`}>
+            <Grid item xs={2} key={`${index}_unit_container`}>
               <TextField
                 defaultValue={variable.units}
-                key={index + "_variable_units"}
+                key={variable.name + "_variable_units"}
                 fullWidth
                 size="small"
                 onChange={(e) => {
@@ -117,10 +120,10 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
                 }}
               />
             </Grid>
-            <Grid item xs={8} key={`${variable.name}_description_container`}>
+            <Grid item xs={8} key={`${index}_description_container`}>
               <TextField
                 defaultValue={variable.description}
-                key={index + "_variable_description"}
+                key={variable.name + "_variable_description"}
                 fullWidth
                 multiline
                 size="small"
@@ -150,6 +153,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
           <TextField
             defaultValue={equation.name}
             fullWidth
+            key="meta_name_input"
             size="small"
             label="Name"
             onChange={(e) =>
@@ -161,6 +165,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
           <TextField
             defaultValue={equation.description}
             fullWidth
+            key="meta_description_input"
             multiline
             label="Description"
             size="small"
@@ -208,17 +213,18 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
           Equation Form Editor
         </Typography>
         {EquationMetaData(newEquation, setNewEquation)}
-        <Container>
-          <Typography variant="h6" component="div" align="center">
-            Add Variables
-          </Typography>
-          {DisplayVariables(newEquation)}
-        </Container>
+        <Container>{DisplayVariables(newEquation)}</Container>
       </CardContent>
       <CardActions>
         <Grid container justifyContent="space-evenly" alignItems="center">
           <Grid item xs="auto">
-            <Button variant="contained" color="error" onClick={() => {}}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                onClose();
+              }}
+            >
               Cancel
             </Button>
           </Grid>
@@ -257,15 +263,24 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
                     course: courseID,
                   },
                 }).then((result) => {
-                  newEquation.variables.forEach((variable) => {
-                    createVariable({
-                      variables: {
-                        name: variable.name,
-                        description: variable.description,
-                        units: variable.units,
-                        equation: result.data.createEquation.id,
-                      },
-                    });
+                  let variablePromises = newEquation.variables.reduce(
+                    (promiseChain, item) => {
+                      return promiseChain.then(() =>
+                        createVariable({
+                          variables: {
+                            name: item.name,
+                            description: item.description,
+                            units: item.units,
+                            equation: result.data.createEquation.id,
+                          },
+                        })
+                      );
+                    },
+                    Promise.resolve()
+                  );
+                  variablePromises.then(() => {
+                    onClose();
+                    Router.push(`/course/${courseID}`);
                   });
                 });
               }}

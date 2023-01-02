@@ -12,7 +12,6 @@ export const variableType = new GraphQLObjectType({
     equation: { type: GraphQLID },
     name: { type: GraphQLString },
     units: { type: GraphQLString },
-    order: { type: GraphQLInt },
     description: { type: GraphQLString },
   }),
 });

@@ -21,9 +21,6 @@ export class Variables extends BaseEntity {
   @Column()
   description!: string;
 
-  @Column()
-  order!: number;
-
   @ManyToOne((type) => Equations, (equation) => equation.variables)
   equation!: Equations;
 }

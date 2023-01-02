@@ -41,15 +41,16 @@ export default function CoursePage({}) {
   }, [data]);
 
   function createEquationFormDialogBox() {
+    function closeDialog() {
+      setCreateNewEquationOpen(false);
+    }
     return (
-      <Dialog
-        open={createNewEquationOpen}
-        onClose={() => {
-          setCreateNewEquationOpen(false);
-        }}
-      >
+      <Dialog open={createNewEquationOpen} onClose={closeDialog}>
         <DialogContent>
-          <EquationFormEditor courseID={parseInt(course_id as string)} />
+          <EquationFormEditor
+            courseID={parseInt(course_id as string)}
+            onClose={closeDialog}
+          />
         </DialogContent>
       </Dialog>
     );
