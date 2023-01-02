@@ -36,6 +36,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
     Equation
       ? Equation
       : {
+          id: 0,
           name: "",
           description: "",
           formula: "",
@@ -46,6 +47,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
   const [createVariable] = useMutation(CREATE_VARIABLE);
 
   useEffect(() => {
+    let variables = [];
     if (newEquation.formula === "") {
       setNewEquation((prev) => {
         return {
@@ -56,14 +58,11 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
       return;
     }
     try {
-      nerdamer(newEquation.formula);
+      variables = nerdamer(newEquation.formula).variables();
     } catch {
       return;
     }
 
-    const variables = newEquation.formula.match(
-      /([a-zA-Z]+_+[a-zA-Z0-9])|([a-zA-Z])/g
-    );
     if (variables) {
       const res: IVariable[] = variables?.map((variable, index) => {
         return { name: variable, units: "", description: "", order: index };
@@ -152,6 +151,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
             defaultValue={equation.name}
             fullWidth
             size="small"
+            label="Name"
             onChange={(e) =>
               setNewEquation((prev) => ({ ...prev, name: e.target.value }))
             }
@@ -162,6 +162,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
             defaultValue={equation.description}
             fullWidth
             multiline
+            label="Description"
             size="small"
             onChange={(e) =>
               setNewEquation((prev) => ({
@@ -174,9 +175,10 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
         <Grid item xs={12} key="meta_equation_input_container">
           <TextField
             fullWidth
+            defaultValue={equation.formula}
             key="meta_equation_input"
             sx={{ width: "100%" }}
-            defaultValue={equation.formula}
+            label="Equation"
             variant="outlined"
             size="small"
             onChange={(e) =>
@@ -210,7 +212,6 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
           <Typography variant="h6" component="div" align="center">
             Add Variables
           </Typography>
-          {/* {DisplayNewVaraible(newEquation, setNewEquation)} */}
           {DisplayVariables(newEquation)}
         </Container>
       </CardContent>
@@ -230,6 +231,7 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
                   Equation
                     ? Equation
                     : {
+                        id: 0,
                         name: "",
                         description: "",
                         formula: "",
@@ -247,7 +249,6 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
               variant="contained"
               color="primary"
               onClick={() => {
-                console.log(`courseId: ${courseID}`);
                 createEquation({
                   variables: {
                     name: newEquation.name,
@@ -256,10 +257,6 @@ const EquationFormEditor = ({ Equation, courseID }: IProps) => {
                     course: courseID,
                   },
                 }).then((result) => {
-                  console.log(
-                    newEquation.variables,
-                    result.data.createEquation.id
-                  );
                   newEquation.variables.forEach((variable) => {
                     createVariable({
                       variables: {

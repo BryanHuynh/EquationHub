@@ -5,7 +5,13 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { GET_EQUATION, GET_ALL_EQUATIONS_FROM_COURSE } from "@/Graphql/Queries";
 import { useEffect, useState } from "react";
-import { CssBaseline, Grid } from "@mui/material";
+import {
+  CssBaseline,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid,
+} from "@mui/material";
 import CoursesToolBar from "@/components/Navbar/CoursesToolBar";
 import { ICalculation } from "@/interfaces/ICalculation";
 import CalculationLogs from "@/components/CalculationLogs/calculationLogs";
@@ -17,6 +23,7 @@ export default function CoursePage({}) {
   const { course_id } = router.query;
   const [equations, setEquations] = useState<IEquation[]>([]);
   const [calculations, setCalculations] = useState<ICalculation[]>([]);
+  const [createNewEquationOpen, setCreateNewEquationOpen] = useState(false);
 
   const appendCalculationToLog = (calculation: ICalculation) => {
     setCalculations((prevCalculations) => [calculation, ...prevCalculations]);
@@ -30,9 +37,23 @@ export default function CoursePage({}) {
 
   useEffect(() => {
     if (typeof data == "undefined") return;
-    console.log(data.getEquationsFromCourse);
     setEquations(data.getEquationsFromCourse);
   }, [data]);
+
+  function createEquationFormDialogBox() {
+    return (
+      <Dialog
+        open={createNewEquationOpen}
+        onClose={() => {
+          setCreateNewEquationOpen(false);
+        }}
+      >
+        <DialogContent>
+          <EquationFormEditor courseID={parseInt(course_id as string)} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   if (typeof course_id !== "string" || loading) return <p>loading...</p>;
 
@@ -42,7 +63,7 @@ export default function CoursePage({}) {
         height: "100vh",
       }}
     >
-      <CoursesToolBar />
+      <CoursesToolBar setNewEquationOpen={setCreateNewEquationOpen} />
       <Container
         sx={{
           mt: 4,
@@ -75,6 +96,7 @@ export default function CoursePage({}) {
       >
         <CalculationLogs calculations={calculations} />
       </div>
+      {createEquationFormDialogBox()}
     </div>
   );
 }

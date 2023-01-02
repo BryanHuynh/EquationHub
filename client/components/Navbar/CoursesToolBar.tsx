@@ -8,7 +8,13 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
-export default function CoursesToolBar() {
+import { Dispatch, SetStateAction } from "react";
+
+interface IProps {
+  setNewEquationOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function CoursesToolBar({ setNewEquationOpen }: IProps) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="transparent">
@@ -20,7 +26,11 @@ export default function CoursesToolBar() {
           </Tooltip>
           <Box sx={{ flexGrow: 1 }} />
           <Tooltip title="Add new Equation">
-            <IconButton>
+            <IconButton
+              onClick={() => {
+                setNewEquationOpen(true);
+              }}
+            >
               <AddIcon />
             </IconButton>
           </Tooltip>
