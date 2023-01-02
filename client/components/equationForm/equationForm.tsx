@@ -128,6 +128,10 @@ const EquationForm = ({ Equation, appendCalculationToLog }: IProps) => {
     let missingVariableAssignments: { [id: string]: string } = {};
     missingVariables.forEach((variable: string, index: number) => {
       var sol = expression.solveFor(variable);
+      try {
+        sol = nerdamer(sol).evaluate();
+      } catch {}
+
       missingVariableAssignments[variable] = sol.toString();
     });
 

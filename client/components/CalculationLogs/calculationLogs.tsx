@@ -10,6 +10,7 @@ import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { Stack } from "@mui/material";
+const katex = require("katex");
 
 interface IProps {
   calculations: ICalculation[];
@@ -20,7 +21,7 @@ interface ICalculationsGroupedByFormula {
 }
 
 export default function CalculationLogs({ calculations }: IProps) {
-  const [groupByFormula, setGroupByFormula] = useState<boolean>(true);
+  const [groupByFormula, setGroupByFormula] = useState<boolean>(false);
   const config = {
     loader: { load: ["input/asciimath"] },
     asciimath: {
@@ -65,11 +66,18 @@ export default function CalculationLogs({ calculations }: IProps) {
             <Table sx={{ minWidth: 650 }} size="small">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>Formula</StyledTableCell>
+                  <StyledTableCell>
+                    {" "}
+                    <MathJaxContext config={config}>
+                      <MathJax>`{calculation.formula}`</MathJax>
+                    </MathJaxContext>
+                  </StyledTableCell>
                   {Object.keys(calculation.variables).map(
                     (variable: string) => (
                       <StyledTableCell key={variable}>
-                        {variable}
+                        <MathJaxContext config={config}>
+                          <MathJax>`{variable}`</MathJax>
+                        </MathJaxContext>
                       </StyledTableCell>
                     )
                   )}
@@ -86,7 +94,9 @@ export default function CalculationLogs({ calculations }: IProps) {
                   {Object.values(calculation.variables).map(
                     (variable: string, index) => (
                       <TableCell key={index}>
-                        <span>{variable}</span>
+                        <MathJaxContext config={config}>
+                          <MathJax>`{variable}`</MathJax>
+                        </MathJaxContext>
                       </TableCell>
                     )
                   )}

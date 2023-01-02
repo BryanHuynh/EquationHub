@@ -9,6 +9,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import { Dispatch, SetStateAction } from "react";
+import router from "next/router";
 
 interface IProps {
   setNewEquationOpen: Dispatch<SetStateAction<boolean>>;
@@ -20,7 +21,11 @@ export default function CoursesToolBar({ setNewEquationOpen }: IProps) {
       <AppBar position="static" color="transparent">
         <Toolbar variant="dense" sx={{ mx: 20 }}>
           <Tooltip title="Return To Courses Page">
-            <IconButton>
+            <IconButton
+              onClick={() => {
+                router.push("/dashboard");
+              }}
+            >
               <ArrowBackIcon />
             </IconButton>
           </Tooltip>
