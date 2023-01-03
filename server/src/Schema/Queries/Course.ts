@@ -22,3 +22,14 @@ export const GET_COURSE = {
       .getOne();
   },
 };
+
+export const GET_COURSES_BY_USER = {
+  type: new GraphQLList(courseType),
+  args: {
+    user: { type: GraphQLID },
+  },
+  async resolve(parent: any, args: any) {
+    const { uid } = args;
+    return await Course.find({ where: { uid } });
+  },
+};

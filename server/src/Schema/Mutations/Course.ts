@@ -6,11 +6,13 @@ export const CREATE_COURSE = {
   type: courseType,
   args: {
     name: { type: GraphQLString },
+    uid: { type: GraphQLString },
   },
   async resolve(parent: any, args: any) {
-    const { name } = args;
+    const { name, uid } = args;
     const res = await Course.insert({
       name,
+      uid,
     });
     const id = res.identifiers[0].id;
     return { id: res.identifiers[0].id, name };

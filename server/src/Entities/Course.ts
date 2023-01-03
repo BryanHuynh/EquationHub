@@ -4,6 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { Equations } from "./Equations";
 
@@ -14,6 +15,9 @@ export class Course extends BaseEntity {
 
   @Column()
   name!: string;
+
+  @Column()
+  uid!: string;
 
   @OneToMany((type) => Equations, (equation) => equation.course)
   equations!: Equations[];

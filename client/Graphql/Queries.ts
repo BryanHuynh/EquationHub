@@ -39,3 +39,12 @@ export const GET_COURSES = gql`
     }
   }
 `;
+
+export const GET_COURSES_BY_USER = gql`
+  query GetCoursesByUser($uid: string!) {
+    getCoursesByUser(uid: $uid) {
+      id
+      name
+    }
+  }
+`;

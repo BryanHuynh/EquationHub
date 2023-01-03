@@ -3,7 +3,6 @@ import { graphqlHTTP } from "express-graphql";
 import cors from "cors";
 import { createConnection } from "typeorm";
 import { schema } from "./Schema";
-import { Users } from "./Entities/Users";
 import { Equations } from "./Entities/Equations";
 import { Variables } from "./Entities/Variables";
 import { Course } from "./Entities/Course";
@@ -17,7 +16,7 @@ const main = async () => {
     password: process.env.PASSWORD,
     logging: false,
     synchronize: true,
-    entities: [Users, Equations, Variables, Course],
+    entities: [Equations, Variables, Course],
   });
 
   const app = express();

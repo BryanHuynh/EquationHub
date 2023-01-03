@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_COURSES } from "@/Graphql/Queries";
+import { GET_COURSES_BY_USER } from "@/Graphql/Queries";
 import { CREATE_COURSE } from "@/Graphql/Mutations";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import react from "react";
 import Router from "next/router";
 import { Box, Container } from "@mui/system";
@@ -22,14 +22,19 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { UserContext } from "@/lib/context";
 
 export default function DashboardPage() {
+  const { user } = useContext(UserContext);
   interface Course {
     id: string;
     name: string;
   }
 
-  const { data, loading } = useQuery(GET_COURSES);
+  const { data, loading } = useQuery(GET_COURSES_BY_USER, {
+    variables: { id: user["uid"] },
+  });
+
   const [courseInput, setCourseInput] = useState<string>("");
   const [createCourse, { error }] = useMutation(CREATE_COURSE);
 
@@ -79,9 +84,12 @@ export default function DashboardPage() {
   }
 
   function handleNewCourseCreate(courseName: string) {
+    if (user == null) return;
+    if (user["uid"] === undefined) return;
     createCourse({
       variables: {
         name: courseName,
+        uid: user["uid"],
       },
     }).then((res) => {
       Router.push(`/dashboard`);
@@ -120,7 +128,7 @@ export default function DashboardPage() {
                 return;
               }
               if (
-                data.getAllCourses.find(
+                data.getCourseByUser.find(
                   (course: Course) =>
                     course.name === courseInputRef.current?.value
                 )
